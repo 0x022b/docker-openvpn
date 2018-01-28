@@ -13,7 +13,12 @@ apk add --no-cache \
 	ca-certificates \
 	iptables \
 	ip6tables \
-	su-exec && \
+	libcap \
+	openvpn \
+	su-exec \
+	sudo && \
+setcap cap_net_admin+ep /usr/sbin/openvpn && \
+deluser openvpn && \
 mkdir -m 0777 -p "${VOLUME}"
 
 VOLUME ["${VOLUME}"]

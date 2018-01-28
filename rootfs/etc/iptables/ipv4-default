@@ -30,6 +30,9 @@
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate INVALID -j DROP
 
+# Accept outgoing connections to specific host and port using specified protocol
+-A OUTPUT -o eth0 -p {PROTO} -m {PROTO} -d {HOST} --dport {PORT} -j ACCEPT
+
 # Redirect new outgoing connections to protocol specific chains
 -A OUTPUT -p icmp -m conntrack --ctstate NEW -j ICMP-OUTPUT
 -A OUTPUT -p udp -m conntrack --ctstate NEW -j UDP-OUTPUT

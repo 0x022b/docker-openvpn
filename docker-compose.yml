@@ -1,11 +1,10 @@
 version: "2.2"
 
 services:
-  template:
-    image: "0x022b/template"
+  openvpn:
+    image: "0x022b/openvpn"
     init: true
     restart: "on-failure"
-    network_mode: "none"
     cap_drop:
       - "ALL"
     cap_add:

@@ -1,7 +1,9 @@
 #!/bin/sh
-user='minion'
+user='openvpn'
 uid="${HOST_UID:-65534}"
 gid="${HOST_GID:-65534}"
+config="/data/${OPENVPN_CLIENT_CONFIG:-config.ovpn}"
+passwd="/data/${OPENVPN_AUTH_USER_PASS:-login.conf}"
 
 '/bin/cat' \
 	'/etc/iptables/default-policy' \
@@ -30,7 +32,16 @@ if ! '/usr/bin/getent' passwd "${uid}"; then
 		-G "${user}" -SD -u "${uid}" "${user}"
 fi
 
-'/bin/cat' \
+if [ ! -e "${config}" ]; then
+	echo 'OpenVPN client configuration missing'
+	exit 1
+fi
+
+proto=$('/usr/bin/awk' '/proto / { print $2 }' "${config}")
+host=$('/usr/bin/awk' '/remote / { print $2 }' "${config}")
+port=$('/usr/bin/awk' '/remote / { print $3 }' "${config}")
+
+'/bin/sed' "s/{PROTO}/${proto}/g; s/{HOST}/${host}/g; s/{PORT}/${port}/g" \
 	'/etc/iptables/ipv4-default' \
 	'/etc/iptables/ipv4-custom' \
 | '/sbin/iptables-restore' --noflush
@@ -62,8 +73,15 @@ if [ -n "${ENABLE_FORWARDING:+x}" ]; then
 	fi
 fi
 
+if ! '/usr/sbin/openvpn' --mktun --dev 'tun0' --dev-type 'tun'; then
+	exit 1
+fi
+
 if [ "$1" == 'container-daemon' ]; then
-	set -- '/bin/sh'
+	set -- '/usr/sbin/openvpn' --config "${config}" \
+		--auth-user-pass "${passwd}" --auth-nocache \
+		--dev 'tun0' --persist-tun --iproute '/usr/sbin/ip-su' \
+		--mute-replay-warnings
 fi
 
 exec '/sbin/su-exec' "${uid}:${gid}" "$@"
