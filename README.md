@@ -23,6 +23,18 @@ capabilities.
 Container can be configured to act as a router by defining a `ENABLE_FORWARDING`
 environment variable. Its value must be a non null value.
 
+## SELinux
+
+To use this container on a host that has SELinux enabled use the provided
+`docker-openvpn.te` policy module or create your own if it doesn't work. To
+compile and install the policy module run the following commands.
+
+```
+$ checkmodule -M -m docker-openvpn.te -o /tmp/docker-openvpn.mod
+$ semodule_package -m /tmp/docker-openvpn.mod -o /tmp/docker-openvpn.pp
+# semodule -i /tmp/docker-openvpn.pp
+```
+
 ## Logging
 
 Container is compatible with `docker logs` command although logging is disabled

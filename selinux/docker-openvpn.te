@@ -1,0 +1,10 @@
+
+module docker-openvpn 1.0;
+
+require {
+	type container_t;
+	class tun_socket { relabelfrom relabelto };
+}
+
+#============= container_t ==============
+allow container_t self:tun_socket { relabelfrom relabelto };
