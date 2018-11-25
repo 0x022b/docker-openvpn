@@ -1,12 +1,3 @@
 *filter
 
-# Accept outgoing ICMP echo requests on tun0 interface
--A ICMP-OUTPUT -o tun0 -p icmp --icmp-type echo-request -j ACCEPT
-
-# Accept outgoing UDP connections on tun0 interface
--A UDP-OUTPUT -o tun0 -p udp -j ACCEPT
-
-# Accept outgoing TCP connections on tun0 interface
--A TCP-OUTPUT -o tun0 -p tcp -j ACCEPT
-
 COMMIT

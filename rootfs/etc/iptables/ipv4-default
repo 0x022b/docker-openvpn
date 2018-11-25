@@ -31,7 +31,7 @@
 -A OUTPUT -m conntrack --ctstate INVALID -j DROP
 
 # Accept outgoing connections to specific host and port using specified protocol
--A OUTPUT -o eth0 -p {PROTO} -m {PROTO} -d {HOST} --dport {PORT} -j ACCEPT
+-A OUTPUT -o eth+ -p {PROTO} -m {PROTO} -d {HOST} --dport {PORT} -j ACCEPT
 
 # Redirect new outgoing connections to protocol specific chains
 -A OUTPUT -p icmp -m conntrack --ctstate NEW -j ICMP-OUTPUT
@@ -42,5 +42,14 @@
 -A OUTPUT -p udp -j REJECT --reject-with icmp-port-unreachable
 -A OUTPUT -p tcp -j REJECT --reject-with tcp-reset
 -A OUTPUT -j REJECT --reject-with icmp-proto-unreachable
+
+# Accept outgoing ICMP echo requests
+-A ICMP-OUTPUT -o tun+ -p icmp --icmp-type echo-request -j ACCEPT
+
+# Accept outgoing UDP connections
+-A UDP-OUTPUT -o tun+ -p udp -j ACCEPT
+
+# Accept outgoing TCP connections
+-A TCP-OUTPUT -o tun+ -p tcp -j ACCEPT
 
 COMMIT
