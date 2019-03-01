@@ -31,7 +31,7 @@ port=$('/usr/bin/awk' '/remote / { print $3 }' "${config}")
 '/usr/bin/find' '/etc/iptables' -type f -print0 \
 | '/usr/bin/xargs' -r0 -n1 '/bin/sed' -i "s/{PROTO}/${proto}/g; s/{HOST}/${host}/g; s/{PORT}/${port}/g"
 
-if [ -f '/proc/net/route' ]; then
+if '/sbin/ip' -4 route | '/bin/grep' -q $; then
     if ! '/sbin/iptables-save' | '/bin/grep' -qE '^\:ICMP\-'; then
         if ! '/sbin/iptables-restore' '/etc/iptables/default-policy'; then
             exit 1
@@ -47,7 +47,7 @@ if [ -f '/proc/net/route' ]; then
     fi
 fi
 
-if [ -f '/proc/net/ipv6_route' ]; then
+if '/sbin/ip' -6 route | '/bin/grep' -q $; then
     if ! '/sbin/ip6tables-save' | '/bin/grep' -qE '^\-'; then
         if ! '/sbin/ip6tables-restore' '/etc/iptables/default-policy'; then
             exit 1
