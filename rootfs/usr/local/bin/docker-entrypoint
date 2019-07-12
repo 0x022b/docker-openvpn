@@ -9,6 +9,33 @@ passwd="/app/${OPENVPN_AUTH_USER_PASS:-login.conf}"
 
 '/bin/mkdir' -p "${home}"
 
+runcfg="${home}/config.ovpn"
+dmnregx='([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,}'
+
+while read -r line; do
+    if printf "${line}" | '/bin/grep' -qE "^remote ${dmnregx} \d+$"; then
+        host=$(printf "${line}" | '/usr/bin/awk' '/^remote / { print $2 }')
+        port=$(printf "${line}" | '/usr/bin/awk' '/^remote / { print $3 }')
+
+        '/usr/bin/dig' +short "${host}" \
+        | while read -r addr; do
+            printf 'remote %s %s\n' "${addr}" "${port}"
+        done
+    else
+        printf '%s\n' "${line}"
+    fi
+done > "${runcfg}" < "${config}"
+
+proto=$('/usr/bin/awk' '/^proto / { print $2 }' "${runcfg}")
+hosts=$('/usr/bin/awk' '/^remote / { print $2 }' "${runcfg}" \
+    | '/usr/bin/sort' -u -n -t. -k1,1 -k2,2 -k3,3 -k4,4 \
+    | '/usr/bin/paste' -s -d,
+)
+ports=$('/usr/bin/awk' '/^remote / { print $3 }' "${runcfg}" \
+    | '/usr/bin/sort' -u -n \
+    | '/usr/bin/paste' -s -d,
+)
+
 if ! '/usr/bin/getent' group "${gid}" > '/dev/null'; then
     '/usr/sbin/addgroup' -g "${gid}" -S "${user}"
 fi
@@ -24,12 +51,9 @@ if ! '/bin/chown' -R "${uid}:${gid}" '/app'; then
     exit 1
 fi
 
-proto=$('/usr/bin/awk' '/proto / { print $2 }' "${config}")
-host=$('/usr/bin/awk' '/remote / { print $2 }' "${config}")
-port=$('/usr/bin/awk' '/remote / { print $3 }' "${config}")
-
 '/usr/bin/find' '/etc/iptables' -type f -print0 \
-| '/usr/bin/xargs' -r0 -n1 '/bin/sed' -i "s/{PROTO}/${proto}/g; s/{HOST}/${host}/g; s/{PORT}/${port}/g"
+| '/usr/bin/xargs' -r0 -n1 '/bin/sed' -i \
+    "s/{PROTO}/${proto}/g; s/{HOST}/${hosts}/g; s/{PORT}/${ports}/g"
 
 if '/sbin/ip' -4 route | '/bin/grep' -q $; then
     if ! '/sbin/iptables-save' | '/bin/grep' -qE '^\:ICMP\-'; then
@@ -60,7 +84,7 @@ if ! '/usr/sbin/openvpn' --mktun --dev 'tun0' --dev-type 'tun'; then
 fi
 
 if [ "$1" == 'container-daemon' ]; then
-    set -- '/usr/sbin/openvpn' --config "${config}" \
+    set -- '/usr/sbin/openvpn' --config "${runcfg}" \
         --auth-user-pass "${passwd}" --auth-nocache \
         --dev 'tun0' --persist-tun --iproute '/usr/sbin/ip-su' \
         --mute-replay-warnings
