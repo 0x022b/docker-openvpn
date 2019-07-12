@@ -8,6 +8,7 @@ VOLUME ["/app"]
 RUN \
 apk upgrade --no-cache && \
 apk add --no-cache \
+    bind-tools \
     ca-certificates \
     iptables \
     ip6tables \
