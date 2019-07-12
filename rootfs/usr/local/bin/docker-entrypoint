@@ -52,7 +52,8 @@ if ! '/bin/chown' -R "${uid}:${gid}" '/app'; then
 fi
 
 '/usr/bin/find' '/etc/iptables' -type f -print0 \
-| '/usr/bin/xargs' -r0 -n1 '/bin/sed' -i "s/{PROTO}/${proto}/g; s/{HOST}/${hosts}/g; s/{PORT}/${ports}/g"
+| '/usr/bin/xargs' -r0 -n1 '/bin/sed' -i \
+    "s/{PROTO}/${proto}/g; s/{HOST}/${hosts}/g; s/{PORT}/${ports}/g"
 
 if '/sbin/ip' -4 route | '/bin/grep' -q $; then
     if ! '/sbin/iptables-save' | '/bin/grep' -qE '^\:ICMP\-'; then
