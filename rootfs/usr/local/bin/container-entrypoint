@@ -16,7 +16,7 @@ mkdir -p "${home}"
 
 config="/app/${OPENVPN_CLIENT_CONFIG:-config.ovpn}"
 passwd="/app/${OPENVPN_AUTH_USER_PASS:-login.conf}"
-runcfg="${home}/config.ovpn"
+runcfg='/tmp/config.ovpn'
 dmnregx='([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,}'
 
 test -f "${config}"
