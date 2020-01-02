@@ -19,6 +19,8 @@ passwd="/app/${OPENVPN_AUTH_USER_PASS:-login.conf}"
 runcfg="${home}/config.ovpn"
 dmnregx='([A-Za-z0-9-]{1,63}\.)+[A-Za-z]{2,}'
 
+test -f "${config}"
+
 while read -r line; do
     if printf '%s' "${line}" | grep -qE "^remote ${dmnregx} \d+$"; then
         host=$(printf '%s' "${line}" | awk '/^remote / { print $2 }')
