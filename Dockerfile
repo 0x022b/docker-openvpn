@@ -17,10 +17,6 @@ VOLUME ["/app"]
 RUN \
 apk add --no-cache \
     bind-tools \
-    libcap \
-    openvpn \
-    sudo && \
-setcap cap_net_admin+ep /usr/sbin/openvpn && \
-deluser openvpn
+    openvpn
 
 COPY rootfs/ /

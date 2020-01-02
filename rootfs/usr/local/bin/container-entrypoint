@@ -64,7 +64,7 @@ if [ "$1" = 'container-daemon' ]; then
 
     set -- openvpn --config "${runcfg}" \
         --auth-user-pass "${passwd}" --auth-nocache \
-        --dev 'tun0' --persist-tun --iproute '/usr/sbin/ip-su' \
+        --dev 'tun0' --persist-tun \
         --mute-replay-warnings
 fi
 
