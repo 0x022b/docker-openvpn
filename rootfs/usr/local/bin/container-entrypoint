@@ -77,9 +77,9 @@ if [ -n "$(ip -6 route | head -c 1)" ]; then
     fi
 fi
 
-openvpn --mktun --dev 'tun0' --dev-type 'tun'
-
 if [ "$1" = 'container-daemon' ]; then
+    openvpn --mktun --dev 'tun0' --dev-type 'tun'
+
     set -- openvpn --config "${runcfg}" \
         --auth-user-pass "${passwd}" --auth-nocache \
         --dev 'tun0' --persist-tun --iproute '/usr/sbin/ip-su' \
