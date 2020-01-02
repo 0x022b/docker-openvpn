@@ -1,7 +1,7 @@
 FROM alpine:3.11
 LABEL maintainer="Janne K <0x022b@gmail.com>"
 
-ENTRYPOINT ["docker-entrypoint"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/container-entrypoint"]
 CMD ["container-daemon"]
 VOLUME ["/app"]
 
@@ -15,7 +15,8 @@ apk add --no-cache \
     libcap \
     openvpn \
     su-exec \
-    sudo && \
+    sudo \
+    tini && \
 setcap cap_net_admin+ep /usr/sbin/openvpn && \
 deluser openvpn
 

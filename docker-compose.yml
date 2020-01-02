@@ -3,7 +3,6 @@ version: '2.2'
 services:
   openvpn:
     image: 0x022b/openvpn
-    init: true
     restart: on-failure
     cap_drop:
       - ALL
