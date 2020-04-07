@@ -21,7 +21,9 @@ In addtion to reaping zombies Tini also performs signal forwarding.
 Container uses iptables to configure packet filtering rules in the Linux kernel
 and therefore CAP_NET_ADMIN capability is required to run the container.
 
-Only local and outbound IPv4 network traffic is allowed.
+Outbound IPv4 network traffic is only allowed using the protocol, address(es) and
+port(s) defined in the OpenVPN configuration file. All outbound traffic that is
+routed through the VPN tunnel is allowed.
 
 All IPv6 traffic is blocked.
 
